@@ -20,6 +20,20 @@ public class ListCourseActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_course);
 
+        CourseDBHelper helper = new CourseDBHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT _id, code, (grade || ' (' || credit || ' credit)') gr1 FROM course ORDER BY _id ASC;", null);
+
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_2, // A textview
+                cursor, // cursor to a data collection
+                new String[] {"code","gr1"}, // column to be displayed
+                new int[] {android.R.id.text1,android.R.id.text2}, // ID of textview to display
+                0);
+
+        ListView lv = (ListView)findViewById(R.id.listView);
+        lv.setAdapter(adapter);
+
     }
 
 

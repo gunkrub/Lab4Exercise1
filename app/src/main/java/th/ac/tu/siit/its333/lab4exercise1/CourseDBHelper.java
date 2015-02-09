@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class CourseDBHelper extends SQLiteOpenHelper {
 
     private static final String name = "courses.sqlite3";
-    private static final int version = 2;
+    private static final int version = 3;
 
 
     public CourseDBHelper(Context ctx) {

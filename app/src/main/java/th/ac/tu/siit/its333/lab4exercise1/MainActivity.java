@@ -28,6 +28,26 @@ public class MainActivity extends ActionBarActivity {
     protected void onResume() {
         super.onResume();
 
+        CourseDBHelper helper = new CourseDBHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT SUM(credit) cr, SUM(credit*value) gp FROM course;", null);
+        cursor.moveToFirst();
+        String cr = cursor.getString(0);
+        String gp = cursor.getString(1);
+
+        TextView tvGP = (TextView)findViewById(R.id.tvGP);
+        tvGP.setText(gp);
+
+        TextView tvCR = (TextView)findViewById(R.id.tvCR);
+        tvCR.setText(cr);
+
+        TextView tvGPA = (TextView)findViewById(R.id.tvGPA);
+        if(cr!=null && gp!=null) {
+            Double GPA = Double.parseDouble(gp) / Double.parseDouble(cr);
+            tvGPA.setText(String.format("%.2f", GPA));
+        }
+
         // This method is called when this activity is put foreground.
 
     }
@@ -48,6 +68,16 @@ public class MainActivity extends ActionBarActivity {
                 break;
 
             case R.id.btReset:
+                helper = new CourseDBHelper(this);
+                SQLiteDatabase db = helper.getWritableDatabase();
+                db.delete("course", "", null);
+                TextView tvGP = (TextView)findViewById(R.id.tvGP);
+                TextView tvGPA = (TextView)findViewById(R.id.tvGPA);
+                TextView tvCR = (TextView)findViewById(R.id.tvCR);
+
+                tvGP.setText("0");
+                tvGPA.setText("-");
+                tvCR.setText("0");
 
                 break;
         }
@@ -60,7 +90,15 @@ public class MainActivity extends ActionBarActivity {
                 String code = data.getStringExtra("code");
                 int credit = data.getIntExtra("credit", 0);
                 String grade = data.getStringExtra("grade");
+                helper = new CourseDBHelper(this);
 
+                SQLiteDatabase db = helper.getWritableDatabase();
+                ContentValues r = new ContentValues();
+                r.put("code",code);
+                r.put("credit", credit);
+                r.put("grade",grade);
+                r.put("value",gradeToValue(grade));
+                db.insert("course", null, r);
             }
         }
 
